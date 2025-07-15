@@ -52,6 +52,18 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				editor: {
+					bg: 'hsl(var(--editor-bg))',
+					border: 'hsl(var(--editor-border))'
+				},
+				toolbar: {
+					bg: 'hsl(var(--toolbar-bg))',
+					border: 'hsl(var(--toolbar-border))'
+				},
+				button: {
+					hover: 'hsl(var(--button-hover))',
+					active: 'hsl(var(--button-active))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
