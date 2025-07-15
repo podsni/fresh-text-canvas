@@ -1,54 +1,26 @@
+import { useState } from 'react';
 import { useEditorStore } from '@/store/editorStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Save, 
-  Download, 
-  FileText,
-  Settings,
-  Menu,
-  X
+  FileText, 
+  Plus, 
+  Download,
+  Edit3
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const DocumentHeader = () => {
   const { 
     currentDocument, 
-    updateTitle, 
+    createDocument, 
     saveDocument, 
-    isSidebarCollapsed, 
-    toggleSidebar 
+    updateTitle 
   } = useEditorStore();
-  const [title, setTitle] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (currentDocument) {
-      setTitle(currentDocument.title);
-    }
-  }, [currentDocument]);
-
-  const handleTitleSubmit = () => {
-    if (title.trim() && currentDocument) {
-      updateTitle(title.trim());
-      setIsEditing(false);
-      toast({
-        title: "Document renamed",
-        description: `Document renamed to "${title.trim()}"`,
-      });
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleTitleSubmit();
-    } else if (e.key === 'Escape') {
-      setTitle(currentDocument?.title || '');
-      setIsEditing(false);
-    }
-  };
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleValue, setTitleValue] = useState(currentDocument?.title || '');
 
   const handleSave = () => {
     saveDocument();
@@ -71,103 +43,94 @@ export const DocumentHeader = () => {
     
     toast({
       title: "Document exported",
-      description: `${currentDocument.title}.html has been downloaded.`,
+      description: "Your document has been downloaded as HTML.",
     });
   };
 
+  const handleTitleSubmit = () => {
+    if (titleValue.trim()) {
+      updateTitle(titleValue.trim());
+    }
+    setIsEditingTitle(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleTitleSubmit();
+    } else if (e.key === 'Escape') {
+      setTitleValue(currentDocument?.title || '');
+      setIsEditingTitle(false);
+    }
+  };
+
   return (
-    <header className="h-16 bg-background border-b border-border flex items-center justify-between px-4 md:px-6 relative z-30">
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* Sidebar toggle for smaller screens */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleSidebar}
-          className="h-8 w-8 p-0 md:hidden"
-        >
-          {isSidebarCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
-        </Button>
-        
-        <FileText className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0" />
-        
-        {currentDocument ? (
-          <div className="flex items-center gap-2 min-w-0">
-            {isEditing ? (
+    <header className="bg-background border-b border-border p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <FileText className="h-6 w-6 text-primary" />
+            {isEditingTitle ? (
               <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={titleValue}
+                onChange={(e) => setTitleValue(e.target.value)}
                 onBlur={handleTitleSubmit}
-                onKeyDown={handleKeyPress}
-                className="h-8 w-32 md:w-64"
+                onKeyDown={handleTitleKeyDown}
+                className="text-xl font-semibold border-none shadow-none p-0 h-auto focus-visible:ring-0"
                 autoFocus
               />
             ) : (
               <h1 
-                className="text-lg md:text-xl font-semibold cursor-pointer hover:bg-muted/50 px-2 py-1 rounded truncate max-w-[200px] md:max-w-none"
-                onClick={() => setIsEditing(true)}
-                title={currentDocument.title}
+                className="text-xl font-semibold cursor-pointer hover:text-primary flex items-center gap-2"
+                onClick={() => {
+                  setTitleValue(currentDocument?.title || '');
+                  setIsEditingTitle(true);
+                }}
               >
-                {currentDocument.title}
+                {currentDocument?.title || 'No Document'}
+                <Edit3 className="h-4 w-4 opacity-50" />
               </h1>
             )}
           </div>
-        ) : (
-          <h1 className="text-lg md:text-xl font-semibold truncate">Rich Text Editor</h1>
-        )}
-      </div>
-
-      {currentDocument && (
-        <div className="flex items-center gap-1 md:gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSave}
-            className="hidden md:flex gap-2"
-          >
-            <Save className="h-4 w-4" />
-            Save
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSave}
-            className="h-8 w-8 p-0 md:hidden"
-            title="Save document"
-          >
-            <Save className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleExport}
-            className="hidden md:flex gap-2"
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleExport}
-            className="h-8 w-8 p-0 md:hidden"
-            title="Export document"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            title="Settings"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          {currentDocument && (
+            <div className="text-sm text-muted-foreground">
+              Last modified: {currentDocument.lastModified.toLocaleString()}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => createDocument()}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Document
+          </Button>
+          
+          {currentDocument && (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleExport}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              
+              <Button 
+                size="sm"
+                onClick={handleSave}
+                className="bg-primary hover:bg-primary/90"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
     </header>
   );
 };
