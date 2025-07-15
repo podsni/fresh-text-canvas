@@ -13,13 +13,23 @@ import {
   Code,
   Minus,
   Type,
+  Image,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Heading1,
+  Heading2,
+  Heading3,
+  Pilcrow,
 } from 'lucide-react';
 
 interface ToolbarProps {
   editor: Editor | null;
+  onImageUpload: () => void;
 }
 
-export const Toolbar = ({ editor }: ToolbarProps) => {
+export const Toolbar = ({ editor, onImageUpload }: ToolbarProps) => {
   if (!editor) {
     return null;
   }
@@ -49,7 +59,7 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
   );
 
   return (
-    <div className="flex items-center gap-1 p-2 bg-toolbar-bg border-b border-toolbar-border">
+    <div className="flex items-center gap-1 p-2 bg-toolbar-bg border-b border-toolbar-border overflow-x-auto">
       {/* Undo/Redo */}
       <ToolbarButton
         onClick={() => editor.chain().focus().undo().run()}
@@ -99,19 +109,53 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         isActive={editor.isActive('heading', { level: 1 })}
       >
-        <span className="font-bold text-sm">H1</span>
+        <Heading1 className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         isActive={editor.isActive('heading', { level: 2 })}
       >
-        <span className="font-bold text-sm">H2</span>
+        <Heading2 className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         isActive={editor.isActive('heading', { level: 3 })}
       >
-        <span className="font-bold text-sm">H3</span>
+        <Heading3 className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().setParagraph().run()}
+        isActive={editor.isActive('paragraph')}
+      >
+        <Pilcrow className="h-4 w-4" />
+      </ToolbarButton>
+
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      {/* Text Alignment */}
+      <ToolbarButton
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        isActive={editor.isActive({ textAlign: 'left' })}
+      >
+        <AlignLeft className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        isActive={editor.isActive({ textAlign: 'center' })}
+      >
+        <AlignCenter className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        isActive={editor.isActive({ textAlign: 'right' })}
+      >
+        <AlignRight className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+        isActive={editor.isActive({ textAlign: 'justify' })}
+      >
+        <AlignJustify className="h-4 w-4" />
       </ToolbarButton>
 
       <Separator orientation="vertical" className="h-6 mx-1" />
@@ -143,6 +187,15 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
       >
         <Minus className="h-4 w-4" />
+      </ToolbarButton>
+
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      {/* Media */}
+      <ToolbarButton
+        onClick={onImageUpload}
+      >
+        <Image className="h-4 w-4" />
       </ToolbarButton>
     </div>
   );

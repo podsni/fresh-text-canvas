@@ -13,6 +13,7 @@ interface EditorState {
   currentDocument: Document | null;
   documents: Document[];
   isLoading: boolean;
+  isSidebarCollapsed: boolean;
   
   // Actions
   createDocument: (title?: string) => void;
@@ -21,6 +22,8 @@ interface EditorState {
   loadDocument: (id: string) => void;
   deleteDocument: (id: string) => void;
   updateTitle: (title: string) => void;
+  toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
 const createNewDocument = (title: string = 'Untitled Document'): Document => ({
@@ -37,6 +40,7 @@ export const useEditorStore = create<EditorState>()(
       currentDocument: null,
       documents: [],
       isLoading: false,
+      isSidebarCollapsed: false,
 
       createDocument: (title = 'Untitled Document') => {
         const newDoc = createNewDocument(title);
@@ -104,12 +108,21 @@ export const useEditorStore = create<EditorState>()(
           )
         }));
       },
+
+      toggleSidebar: () => {
+        set(state => ({ isSidebarCollapsed: !state.isSidebarCollapsed }));
+      },
+
+      setSidebarCollapsed: (collapsed: boolean) => {
+        set({ isSidebarCollapsed: collapsed });
+      },
     }),
     {
       name: 'editor-storage',
       partialize: (state) => ({
         documents: state.documents,
         currentDocument: state.currentDocument,
+        isSidebarCollapsed: state.isSidebarCollapsed,
       }),
     }
   )

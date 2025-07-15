@@ -38,9 +38,9 @@ const Index = () => {
   return (
     <div className="h-screen flex flex-col bg-background">
       <DocumentHeader />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         <DocumentSidebar />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out">
           {currentDocument ? (
             <RichTextEditor />
           ) : (
